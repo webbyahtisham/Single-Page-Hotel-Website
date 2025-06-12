@@ -11,24 +11,41 @@ window.addEventListener("scroll", function () {
 const navLinks = document.querySelectorAll(".nav-link");
 const underline = document.querySelector(".nav-underline");
 const sections = document.querySelectorAll("section, .home");
+let activeLink = null;
 
+// Move underline under target element
 function moveUnderline(target) {
     const rect = target.getBoundingClientRect();
     const parentRect = target.parentElement.parentElement.getBoundingClientRect();
     underline.style.left = `${rect.left - parentRect.left + rect.width / 2 - 15}px`;
 }
 
+// Set a new active link
+function setActiveLink(link) {
+    navLinks.forEach(l => l.classList.remove("active"));
+    link.classList.add("active");
+    activeLink = link;
+    moveUnderline(link);
+}
+
+// Hover: move underline to hovered link
 navLinks.forEach(link => {
     link.addEventListener("mouseenter", (e) => {
         moveUnderline(e.target);
     });
 
-    link.addEventListener("mouseleave", () => {
-        const active = document.querySelector(".nav-link.active");
-        if (active) moveUnderline(active);
+    // Optional: clicking manually sets active
+    link.addEventListener("click", (e) => {
+        setActiveLink(e.target);
     });
 });
 
+// Mouse leaves navbar → return underline to current active
+document.querySelector(".navbar-ul").addEventListener("mouseleave", () => {
+    if (activeLink) moveUnderline(activeLink);
+});
+
+// Scroll → update active link and underline
 window.addEventListener("scroll", () => {
     let current = "";
 
@@ -41,20 +58,18 @@ window.addEventListener("scroll", () => {
         }
     });
 
-    navLinks.forEach(link => {
-        link.classList.remove("active");
-        if (link.getAttribute("href") === `#${current}`) {
-            link.classList.add("active");
-            moveUnderline(link);
-        }
-    });
-});
-
-// Move underline to the first link on load
-window.addEventListener("load", () => {
-    const active = document.querySelector(".nav-link");
-    if (active) {
-        moveUnderline(active);
-        underline.style.opacity = "1"; // show after positioning
+    const matchingLink = [...navLinks].find(link => link.getAttribute("href") === `#${current}`);
+    if (matchingLink && matchingLink !== activeLink) {
+        setActiveLink(matchingLink);
     }
 });
+
+// Initial setup on load
+window.addEventListener("load", () => {
+    const initial = document.querySelector(".nav-link.active") || navLinks[0];
+    setActiveLink(initial);
+    underline.style.opacity = "1";
+});
+
+// Gallery scroll bar
+ 
