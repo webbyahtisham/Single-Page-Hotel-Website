@@ -72,4 +72,5 @@ window.addEventListener("load", () => {
 });
 
 // Gallery scroll bar
- 
+
+
